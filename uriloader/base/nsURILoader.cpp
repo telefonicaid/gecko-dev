@@ -363,11 +363,16 @@ nsresult nsDocumentOpenInfo::DispatchContent(nsIRequest *request, nsISupports * 
   bool forceExternalHandling = false;
   uint32_t disposition;
   rv = aChannel->GetContentDisposition(&disposition);
-  if (NS_SUCCEEDED(rv) && disposition == nsIChannel::DISPOSITION_ATTACHMENT)
+
+  bool isOMADRMMessage =
+    mContentType.LowerCaseEqualsASCII("application/vnd.oma.drm.message");
+
+  if (NS_SUCCEEDED(rv) && (disposition == nsIChannel::DISPOSITION_ATTACHMENT) &&
+      !isOMADRMMessage)
     forceExternalHandling = true;
 
   LOG(("  forceExternalHandling: %s", forceExternalHandling ? "yes" : "no"));
-    
+
   // We're going to try to find a contentListener that can handle our data
   nsCOMPtr<nsIURIContentListener> contentListener;
   // The type or data the contentListener wants.
